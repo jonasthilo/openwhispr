@@ -1039,9 +1039,6 @@ if (gotSingleInstanceLock) {
     if (updateManager) {
       updateManager.cleanup();
     }
-    if (clipboardManager) {
-      clipboardManager.dispose();
-    }
     // Stop whisper server if running
     if (whisperManager) {
       whisperManager.stopServer().catch(() => {});

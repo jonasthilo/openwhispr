@@ -37,16 +37,13 @@ const getSystemAudioStream = async (): Promise<MediaStream | null> => {
       return null;
     }
 
-    // Stop video tracks — with getDisplayMedia the audio track lifecycle is independent
-    videoTracks.forEach((t) => t.stop());
+    // Video tracks must stay alive — stopping them kills the ScreenCaptureKit loopback audio
 
-    // Monitor audio track health
     audioTracks[0].addEventListener("ended", () => {
       logger.error("Audio track ended unexpectedly", {}, "meeting");
     });
 
-    const audioOnlyStream = new MediaStream(audioTracks);
-    return audioOnlyStream;
+    return stream;
   } catch (err) {
     logger.error("Failed to capture system audio", { error: (err as Error).message }, "meeting");
     return null;
