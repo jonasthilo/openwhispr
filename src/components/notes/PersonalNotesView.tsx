@@ -324,9 +324,7 @@ export default function PersonalNotesView({
     if (!transcript) return;
 
     const combinedContent = [
-      localContentRef.current.trim()
-        ? `## My Notes\n${localContentRef.current}`
-        : "",
+      localContentRef.current.trim() ? `## My Notes\n${localContentRef.current}` : "",
       `## Meeting Transcript\n${transcript}`,
     ]
       .filter(Boolean)
@@ -753,11 +751,22 @@ export default function PersonalNotesView({
               actionPicker={
                 <ActionPicker
                   onRunAction={(action) => {
-                    if (!localContent.trim()) return;
-                    runAction(action, localContent, { isCloudMode, modelId: effectiveModelId });
+                    const transcript = meetingTranscript || activeNote?.transcript;
+                    const hasNotes = !!localContent.trim();
+                    if (!hasNotes && !transcript) return;
+                    const parts = [
+                      hasNotes ? localContent : "",
+                      transcript ? `## Meeting Transcript\n${transcript}` : "",
+                    ]
+                      .filter(Boolean)
+                      .join("\n\n");
+                    runAction(action, parts, { isCloudMode, modelId: effectiveModelId });
                   }}
                   onManageActions={() => setShowActionManager(true)}
-                  disabled={!localContent.trim() || actionProcessingState === "processing"}
+                  disabled={
+                    (!localContent.trim() && !meetingTranscript && !activeNote?.transcript) ||
+                    actionProcessingState === "processing"
+                  }
                 />
               }
             />
