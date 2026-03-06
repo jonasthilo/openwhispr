@@ -99,9 +99,14 @@ export default function ControlPanelSidebar({
             <span className="flex-1 text-[11px] text-left text-muted-foreground/50">
               {t("commandSearch.shortPlaceholder")}
             </span>
-            <kbd className="text-[10px] text-muted-foreground/35 font-mono leading-none">
-              {platform === "darwin" ? "⌘K" : "⌃K"}
-            </kbd>
+            <div className="flex items-center gap-0.5 shrink-0">
+              <kbd className="text-[10px] px-1 py-px rounded border border-border/30 dark:border-white/8 bg-muted/40 text-muted-foreground/40 font-mono leading-tight">
+                {platform === "darwin" ? "⌘" : "Ctrl"}
+              </kbd>
+              <kbd className="text-[10px] px-1 py-px rounded border border-border/30 dark:border-white/8 bg-muted/40 text-muted-foreground/40 font-mono leading-tight">
+                K
+              </kbd>
+            </div>
           </button>
         </div>
       )}
