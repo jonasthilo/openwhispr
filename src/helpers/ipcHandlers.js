@@ -2211,6 +2211,12 @@ class IPCHandlers {
     };
 
     const fetchRealtimeToken = async (event, options) => {
+      if (options.mode === "byok") {
+        const apiKey = this.environmentManager.getOpenAIKey();
+        if (!apiKey) throw new Error("No OpenAI API key configured. Add your key in Settings.");
+        return apiKey;
+      }
+
       const apiUrl = getApiUrl();
       if (!apiUrl) throw new Error("OpenWhispr API URL not configured");
 
