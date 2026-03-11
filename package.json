@@ -4,6 +4,9 @@
   "description": "A desktop dictation application using whisper.cpp for speech-to-text transcription",
   "main": "main.js",
   "private": true,
+  "engines": {
+    "node": ">=22"
+  },
   "scripts": {
     "compile:globe": "node scripts/build-globe-listener.js",
     "compile:fast-paste": "node scripts/build-macos-fast-paste.js",
