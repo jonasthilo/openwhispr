@@ -26,9 +26,10 @@ import {
   RotateCw,
   BookOpen,
   Copy,
+  Trash2,
 } from "lucide-react";
 import { useAuth } from "../hooks/useAuth";
-import { NEON_AUTH_URL, signOut } from "../lib/neonAuth";
+import { NEON_AUTH_URL, signOut, deleteAccount } from "../lib/neonAuth";
 import MicPermissionWarning from "./ui/MicPermissionWarning";
 import MicrophoneSettings from "./ui/MicrophoneSettings";
 import PermissionCard from "./ui/PermissionCard";
@@ -682,6 +683,8 @@ export default function SettingsPage({ activeSection = "general" }: SettingsPage
     customReasoningApiKey,
     setCustomReasoningApiKey,
     setDictationKey,
+    meetingKey,
+    setMeetingKey,
     autoLearnCorrections,
     setAutoLearnCorrections,
     updateTranscriptionSettings,
@@ -862,6 +865,16 @@ export default function SettingsPage({ activeSection = "general" }: SettingsPage
     showAlert: showAlertDialog,
   });
 
+  const { registerHotkey: registerMeetingHotkey, isRegistering: isMeetingHotkeyRegistering } =
+    useHotkeyRegistration({
+      onSuccess: (registeredHotkey) => {
+        setMeetingKey(registeredHotkey);
+      },
+      showSuccessToast: false,
+      showErrorToast: true,
+      showAlert: showAlertDialog,
+    });
+
   const validateHotkeyForInput = useCallback(
     (hotkey: string) => getValidationMessage(hotkey, getPlatform()),
     []
@@ -1037,6 +1050,7 @@ export default function SettingsPage({ activeSection = "general" }: SettingsPage
 
   const { isSignedIn, isLoaded, user } = useAuth();
   const [isSigningOut, setIsSigningOut] = useState(false);
+  const [isDeletingAccount, setIsDeletingAccount] = useState(false);
   const [isOpeningBilling, setIsOpeningBilling] = useState(false);
   const [billingState, setBillingState] = useState<Record<string, boolean>>({
     pro: true,
@@ -1147,6 +1161,49 @@ export default function SettingsPage({ activeSection = "general" }: SettingsPage
     }
   }, [showAlertDialog, t]);
 
+  const handleDeleteAccount = useCallback(() => {
+    showConfirmDialog({
+      title: t("settingsPage.account.deleteAccount.title"),
+      description: t("settingsPage.account.deleteAccount.description"),
+      onConfirm: async () => {
+        setIsDeletingAccount(true);
+        try {
+          // Best-effort cloud cleanup (needs session cookies before sign-out)
+          try {
+            const { NotesService } = await import("../services/NotesService");
+            await NotesService.deleteAll();
+          } catch {}
+
+          const result = await deleteAccount();
+          if (result.error) {
+            logger.error("Server account deletion failed", result.error, "auth");
+          }
+
+          try {
+            await signOut();
+          } catch {}
+          await window.electronAPI?.cleanupApp();
+
+          showAlertDialog({
+            title: t("settingsPage.account.deleteAccount.successTitle"),
+            description: t("settingsPage.account.deleteAccount.successDescription"),
+          });
+          setTimeout(() => window.location.reload(), 1000);
+        } catch (error) {
+          logger.error("Account deletion failed", error, "auth");
+          showAlertDialog({
+            title: t("settingsPage.account.deleteAccount.failedTitle"),
+            description: t("settingsPage.account.deleteAccount.failedDescription"),
+          });
+        } finally {
+          setIsDeletingAccount(false);
+        }
+      },
+      variant: "destructive",
+      confirmText: t("settingsPage.account.deleteAccount.confirmText"),
+    });
+  }, [showConfirmDialog, showAlertDialog, t]);
+
   const renderSectionContent = () => {
     switch (activeSection) {
       case "account":
@@ -1211,6 +1268,28 @@ export default function SettingsPage({ activeSection = "general" }: SettingsPage
                         ? t("settingsPage.account.signOut.signingOut")
                         : t("settingsPage.account.signOut.signOut")}
                     </Button>
+                  </SettingsPanelRow>
+                </SettingsPanel>
+
+                <SettingsPanel>
+                  <SettingsPanelRow>
+                    <SettingsRow
+                      label={t("settingsPage.account.deleteAccount.label")}
+                      description={t("settingsPage.account.deleteAccount.labelDescription")}
+                    >
+                      <Button
+                        onClick={handleDeleteAccount}
+                        variant="outline"
+                        disabled={isDeletingAccount}
+                        size="sm"
+                        className="text-destructive border-destructive/30 hover:bg-destructive/10 hover:border-destructive"
+                      >
+                        <Trash2 className="mr-1.5 h-3.5 w-3.5" />
+                        {isDeletingAccount
+                          ? t("settingsPage.account.deleteAccount.deleting")
+                          : t("settingsPage.account.deleteAccount.button")}
+                      </Button>
+                    </SettingsRow>
                   </SettingsPanelRow>
                 </SettingsPanel>
               </>
@@ -2672,6 +2751,37 @@ EOF`,
                 )}
               </SettingsPanel>
             </div>
+
+            {/* Meeting Mode Hotkey */}
+            <div>
+              <SectionHeader
+                title={t("settingsPage.general.meetingHotkey.title")}
+                description={t("settingsPage.general.meetingHotkey.description")}
+              />
+              <SettingsPanel>
+                <SettingsPanelRow>
+                  <HotkeyInput
+                    value={meetingKey}
+                    onChange={async (newHotkey) => {
+                      await registerMeetingHotkey(newHotkey);
+                    }}
+                    disabled={isMeetingHotkeyRegistering}
+                    validate={validateHotkeyForInput}
+                  />
+                  {meetingKey && (
+                    <button
+                      onClick={() => {
+                        setMeetingKey("");
+                      }}
+                      disabled={isMeetingHotkeyRegistering}
+                      className="mt-2 text-xs text-muted-foreground/70 hover:text-foreground transition-colors disabled:opacity-50"
+                    >
+                      {t("settingsPage.general.meetingHotkey.clear")}
+                    </button>
+                  )}
+                </SettingsPanelRow>
+              </SettingsPanel>
+            </div>
           </div>
         );
 
@@ -3435,28 +3545,29 @@ EOF`,
                           showConfirmDialog({
                             title: t("settingsPage.developer.resetAll.title"),
                             description: t("settingsPage.developer.resetAll.description"),
-                            onConfirm: () => {
-                              window.electronAPI
-                                ?.cleanupApp()
-                                .then(() => {
-                                  showAlertDialog({
-                                    title: t("settingsPage.developer.resetAll.successTitle"),
-                                    description: t(
-                                      "settingsPage.developer.resetAll.successDescription"
-                                    ),
-                                  });
-                                  setTimeout(() => {
-                                    window.location.reload();
-                                  }, 1000);
-                                })
-                                .catch(() => {
-                                  showAlertDialog({
-                                    title: t("settingsPage.developer.resetAll.failedTitle"),
-                                    description: t(
-                                      "settingsPage.developer.resetAll.failedDescription"
-                                    ),
-                                  });
+                            onConfirm: async () => {
+                              try {
+                                try {
+                                  await signOut();
+                                } catch {}
+                                await window.electronAPI?.cleanupApp();
+                                showAlertDialog({
+                                  title: t("settingsPage.developer.resetAll.successTitle"),
+                                  description: t(
+                                    "settingsPage.developer.resetAll.successDescription"
+                                  ),
                                 });
+                                setTimeout(() => {
+                                  window.location.reload();
+                                }, 1000);
+                              } catch {
+                                showAlertDialog({
+                                  title: t("settingsPage.developer.resetAll.failedTitle"),
+                                  description: t(
+                                    "settingsPage.developer.resetAll.failedDescription"
+                                  ),
+                                });
+                              }
                             },
                             variant: "destructive",
                             confirmText: t("settingsPage.developer.resetAll.confirmText"),

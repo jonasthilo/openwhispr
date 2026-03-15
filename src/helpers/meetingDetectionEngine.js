@@ -194,6 +194,36 @@ class MeetingDetectionEngine {
     }
   }
 
+  async startManualMeeting() {
+    const event = {
+      id: `manual-${Date.now()}`,
+      calendar_id: "__manual__",
+      summary: "New note",
+      start_time: new Date().toISOString(),
+      end_time: new Date(Date.now() + 3600000).toISOString(),
+      is_all_day: 0,
+      status: "confirmed",
+      hangout_link: null,
+      conference_data: null,
+      organizer_email: null,
+      attendees_count: 0,
+    };
+
+    const noteResult = this.databaseManager.saveNote(event.summary, "", "meeting");
+    const meetingsFolder = this.databaseManager.getMeetingsFolder();
+
+    if (noteResult?.note?.id && meetingsFolder?.id) {
+      await this.windowManager.createControlPanelWindow();
+      await new Promise((resolve) => setTimeout(resolve, 50));
+      this.windowManager.snapControlPanelToMeetingMode();
+      this.windowManager.sendToControlPanel("navigate-to-meeting-note", {
+        noteId: noteResult.note.id,
+        folderId: meetingsFolder.id,
+        event,
+      });
+    }
+  }
+
   handleNotificationTimeout() {
     for (const [detectionId, detection] of this.activeDetections) {
       if (!detection.dismissed) {

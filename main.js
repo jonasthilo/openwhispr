@@ -614,6 +614,27 @@ async function startApp() {
     }
   });
 
+  // Set up meeting mode hotkey
+  const meetingHotkeyCallback = () => {
+    if (hotkeyManager.isInListeningMode()) return;
+    meetingDetectionEngine?.startManualMeeting();
+  };
+
+  const savedMeetingKey = environmentManager.getMeetingKey?.() || "";
+  if (savedMeetingKey) {
+    hotkeyManager.registerSlot("meeting", savedMeetingKey, meetingHotkeyCallback);
+  }
+
+  ipcMain.on("meeting-hotkey-changed", (_event, hotkey) => {
+    if (hotkey) {
+      hotkeyManager.registerSlot("meeting", hotkey, meetingHotkeyCallback);
+      environmentManager.saveMeetingKey(hotkey);
+    } else {
+      hotkeyManager.unregisterSlot("meeting");
+      environmentManager.saveMeetingKey("");
+    }
+  });
+
   // Phase 2: Initialize remaining managers after windows are visible
   initializeDeferredManagers();
 

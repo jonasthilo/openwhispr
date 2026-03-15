@@ -1013,7 +1013,20 @@
         "title": "Pro 7 Tage kostenlos testen"
       },
       "user": "Benutzer",
-      "wordsRemaining": "{{remaining}} verbleibend"
+      "wordsRemaining": "{{remaining}} verbleibend",
+      "deleteAccount": {
+        "label": "Konto löschen",
+        "labelDescription": "Konto, alle Cloud-Daten und lokale Daten dauerhaft löschen. Diese Aktion kann nicht rückgängig gemacht werden.",
+        "button": "Mein Konto löschen",
+        "deleting": "Wird gelöscht...",
+        "title": "Konto löschen?",
+        "description": "Dies löscht dauerhaft Ihr OpenWhispr-Konto, alle in der Cloud synchronisierten Notizen und alle lokalen Daten, einschließlich Transkriptionen, Audioaufnahmen, heruntergeladene Modelle, Kalenderverbindungen und Einstellungen. Diese Aktion kann nicht rückgängig gemacht werden.",
+        "confirmText": "Alles löschen",
+        "successTitle": "Konto gelöscht",
+        "successDescription": "Ihr Konto und alle Daten wurden gelöscht. Die App wird jetzt neu geladen.",
+        "failedTitle": "Löschung fehlgeschlagen",
+        "failedDescription": "Beim Löschen Ihres Kontos ist ein Fehler aufgetreten. Ihre lokalen Daten wurden möglicherweise teilweise entfernt. Bitte versuchen Sie es erneut."
+      }
     },
     "agentConfig": {
       "agentName": "Agent-Name",
@@ -1077,7 +1090,7 @@
       "removing": "Wird entfernt...",
       "resetAll": {
         "confirmText": "Alles löschen",
-        "description": "Dadurch werden alle Einstellungen, Transkriptionen und zwischengespeicherten Daten dauerhaft gelöscht. Die App wird nach dem Zurücksetzen neu geladen.",
+        "description": "Dies löscht dauerhaft alle lokalen Einstellungen, Transkriptionen, Audioaufnahmen, heruntergeladene KI-Modelle, Kalenderverbindungen und zwischengespeicherte Daten. Cloud-Daten und Ihr Konto werden nicht beeinträchtigt. Die App wird nach dem Zurücksetzen neu geladen.",
         "failedDescription": "Etwas ist schiefgelaufen. Bitte versuchen Sie es erneut oder installieren Sie die App neu.",
         "failedTitle": "Zurücksetzen fehlgeschlagen",
         "successDescription": "Alles wurde zurückgesetzt. Die App wird jetzt neu geladen.",
@@ -1085,7 +1098,7 @@
         "title": "Alle App-Daten zurücksetzen"
       },
       "resetAppData": "App-Daten zurücksetzen",
-      "resetAppDataDescription": "Alle Einstellungen, Transkriptionen und zwischengespeicherten Daten dauerhaft löschen"
+      "resetAppDataDescription": "Alle lokalen Einstellungen, Transkriptionen, Audioaufnahmen, heruntergeladene Modelle und zwischengespeicherte Daten dauerhaft löschen"
     },
     "dictionary": {
       "title": "Benutzerwörterbuch",
@@ -1130,6 +1143,11 @@
         "description": "Die Tastenkombination, die das Sprachdiktat startet und stoppt",
         "resetToDefault": "Auf {{hotkey}} zurücksetzen",
         "title": "Diktat-Hotkey"
+      },
+      "meetingHotkey": {
+        "title": "Meeting-Modus-Hotkey",
+        "description": "Meeting-Modus starten und das Panel an den Bildschirmrand verschieben",
+        "clear": "Hotkey entfernen"
       },
       "microphone": {
         "description": "Wählen Sie das Eingabegerät für das Diktat",

@@ -86,6 +86,16 @@ class GoogleCalendarManager {
     return result;
   }
 
+  async revokeAllTokens() {
+    try {
+      const allTokens = this.databaseManager.getAllGoogleTokens();
+      await Promise.allSettled(allTokens.map((t) => this.oauth.revokeToken(t.access_token)));
+    } catch (err) {
+      debugLogger.error("Error revoking Google tokens", { error: err.message }, "gcal");
+    }
+    this.disconnect();
+  }
+
   disconnect(email) {
     if (email) {
       this.removeAccount(email);

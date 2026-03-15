@@ -1013,7 +1013,20 @@
         "button": "Créer un compte gratuit"
       },
       "user": "Utilisateur",
-      "wordsRemaining": "{{remaining}} restants"
+      "wordsRemaining": "{{remaining}} restants",
+      "deleteAccount": {
+        "label": "Supprimer le compte",
+        "labelDescription": "Supprimer définitivement votre compte, toutes les données cloud et les données locales. Cette action est irréversible.",
+        "button": "Supprimer mon compte",
+        "deleting": "Suppression...",
+        "title": "Supprimer votre compte ?",
+        "description": "Cela supprimera définitivement votre compte OpenWhispr, toutes les notes synchronisées dans le cloud et toutes les données locales, y compris les transcriptions, les enregistrements audio, les modèles téléchargés, les connexions de calendrier et les paramètres. Cette action est irréversible.",
+        "confirmText": "Tout supprimer",
+        "successTitle": "Compte supprimé",
+        "successDescription": "Votre compte et toutes les données ont été supprimés. L'application va maintenant se recharger.",
+        "failedTitle": "Échec de la suppression",
+        "failedDescription": "Une erreur s'est produite lors de la suppression de votre compte. Vos données locales ont peut-être été partiellement supprimées. Veuillez réessayer."
+      }
     },
     "agentConfig": {
       "agentName": "Nom de l'agent",
@@ -1077,7 +1090,7 @@
       "removing": "Suppression...",
       "resetAll": {
         "confirmText": "Tout supprimer",
-        "description": "Cela supprimera définitivement tous les paramètres, transcriptions et données en cache. L'application redémarrera après la réinitialisation.",
+        "description": "Cela supprimera définitivement tous les paramètres locaux, transcriptions, enregistrements audio, modèles IA téléchargés, connexions de calendrier et données en cache. Les données cloud et votre compte ne seront pas affectés. L'application se rechargera après la réinitialisation.",
         "failedDescription": "Un problème est survenu. Veuillez réessayer ou réinstaller l'application.",
         "failedTitle": "Impossible de réinitialiser",
         "successDescription": "Tout a été réinitialisé. L'application va redémarrer.",
@@ -1085,7 +1098,7 @@
         "title": "Réinitialiser toutes les données de l'application"
       },
       "resetAppData": "Réinitialiser les données de l'application",
-      "resetAppDataDescription": "Supprime définitivement tous les paramètres, transcriptions et données en cache"
+      "resetAppDataDescription": "Supprimer définitivement tous les paramètres locaux, transcriptions, enregistrements audio, modèles téléchargés et données en cache"
     },
     "dictionary": {
       "title": "Dictionnaire personnalisé",
@@ -1130,6 +1143,11 @@
         "description": "La combinaison de touches qui démarre et arrête la dictée vocale",
         "resetToDefault": "Réinitialiser à {{hotkey}}",
         "title": "Raccourci de dictée"
+      },
+      "meetingHotkey": {
+        "title": "Raccourci mode réunion",
+        "description": "Démarrer le mode réunion et ancrer le panneau sur le côté de l'écran",
+        "clear": "Supprimer le raccourci"
       },
       "microphone": {
         "description": "Sélectionnez le périphérique d'entrée à utiliser pour la dictée",

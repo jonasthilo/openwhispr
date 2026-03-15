@@ -1013,7 +1013,20 @@
         "button": "免费创建账户"
       },
       "user": "用户",
-      "wordsRemaining": "剩余 {{remaining}} 个词"
+      "wordsRemaining": "剩余 {{remaining}} 个词",
+      "deleteAccount": {
+        "label": "删除账户",
+        "labelDescription": "永久删除您的账户、所有云端数据和本地数据。此操作无法撤销。",
+        "button": "删除我的账户",
+        "deleting": "正在删除...",
+        "title": "删除您的账户？",
+        "description": "这将永久删除您的 OpenWhispr 账户、所有云端同步笔记和所有本地数据，包括转录、音频录制、下载的模型、日历连接和设置。此操作无法撤销。",
+        "confirmText": "删除所有内容",
+        "successTitle": "账户已删除",
+        "successDescription": "您的账户和所有数据已被删除。应用将立即重新加载。",
+        "failedTitle": "删除失败",
+        "failedDescription": "删除您的账户时出错。您的本地数据可能已被部分删除。请重试。"
+      }
     },
     "agentConfig": {
       "agentName": "助手名称",
@@ -1077,7 +1090,7 @@
       "removing": "正在删除...",
       "resetAll": {
         "confirmText": "删除所有数据",
-        "description": "这将永久删除所有设置、转录记录和缓存数据。重置后应用将重新加载。",
+        "description": "这将永久删除所有本地设置、转录、音频录制、下载的 AI 模型、日历连接和缓存数据。云端数据和您的账户不会受到影响。应用将在重置后重新加载。",
         "failedDescription": "出了点问题，请重试或重新安装应用。",
         "failedTitle": "无法重置",
         "successDescription": "所有数据已重置，应用将立即重新加载。",
@@ -1085,7 +1098,7 @@
         "title": "重置所有应用数据"
       },
       "resetAppData": "重置应用数据",
-      "resetAppDataDescription": "永久删除所有设置、转录记录和缓存数据"
+      "resetAppDataDescription": "永久删除所有本地设置、转录、音频录制、下载的模型和缓存数据"
     },
     "dictionary": {
       "title": "自定义词典",
@@ -1130,6 +1143,11 @@
         "description": "用于开始和停止语音听写的组合键",
         "resetToDefault": "重置为 {{hotkey}}",
         "title": "听写快捷键"
+      },
+      "meetingHotkey": {
+        "title": "会议模式快捷键",
+        "description": "启动会议模式并将面板固定到屏幕侧边",
+        "clear": "移除快捷键"
       },
       "microphone": {
         "description": "选择用于听写的输入设备",

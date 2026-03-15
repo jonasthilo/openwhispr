@@ -3,7 +3,6 @@ const path = require("path");
 const http = require("http");
 const https = require("https");
 const crypto = require("crypto");
-const AppUtils = require("../utils");
 const debugLogger = require("./debugLogger");
 const GnomeShortcutManager = require("./gnomeShortcut");
 const HyprlandShortcutManager = require("./hyprlandShortcut");
@@ -1145,8 +1144,111 @@ class IPCHandlers {
     });
 
     ipcMain.handle("cleanup-app", async (event) => {
-      AppUtils.cleanup(this.windowManager.mainWindow);
-      return { success: true, message: "Cleanup completed successfully" };
+      const fs = require("fs");
+      const os = require("os");
+      const errors = [];
+      const mainWindow = this.windowManager.mainWindow;
+
+      // Stop services before deleting files they hold open
+      try {
+        await this.parakeetManager?.stopServer();
+      } catch (e) {
+        errors.push(`Parakeet stop: ${e.message}`);
+      }
+      try {
+        this.whisperManager?.stopServer();
+      } catch (e) {
+        errors.push(`Whisper stop: ${e.message}`);
+      }
+      try {
+        this.googleCalendarManager?.stop();
+      } catch (e) {
+        errors.push(`GCal stop: ${e.message}`);
+      }
+
+      // Revoke Google OAuth tokens before DB is closed
+      try {
+        await this.googleCalendarManager?.revokeAllTokens();
+      } catch (e) {
+        errors.push(`GCal revoke: ${e.message}`);
+      }
+
+      // Close DB connection before deleting the file
+      try {
+        this.databaseManager?.db?.close();
+      } catch (e) {
+        errors.push(`DB close: ${e.message}`);
+      }
+
+      // Delete audio files
+      try {
+        this.audioStorageManager.deleteAllAudio();
+      } catch (e) {
+        errors.push(`Audio delete: ${e.message}`);
+      }
+
+      // Delete downloaded models
+      try {
+        const whisperDir = path.join(os.homedir(), ".cache", "openwhispr", "whisper-models");
+        if (fs.existsSync(whisperDir)) fs.rmSync(whisperDir, { recursive: true, force: true });
+      } catch (e) {
+        errors.push(`Whisper models: ${e.message}`);
+      }
+      try {
+        await this.parakeetManager?.deleteAllParakeetModels();
+      } catch (e) {
+        errors.push(`Parakeet models: ${e.message}`);
+      }
+      try {
+        const modelManager = require("./modelManagerBridge").default;
+        await modelManager.deleteAllModels();
+      } catch (e) {
+        errors.push(`LLM models: ${e.message}`);
+      }
+
+      // Delete database file + WAL/SHM
+      try {
+        const dbPath = path.join(
+          app.getPath("userData"),
+          process.env.NODE_ENV === "development" ? "transcriptions-dev.db" : "transcriptions.db"
+        );
+        if (fs.existsSync(dbPath)) fs.unlinkSync(dbPath);
+        if (fs.existsSync(dbPath + "-wal")) fs.unlinkSync(dbPath + "-wal");
+        if (fs.existsSync(dbPath + "-shm")) fs.unlinkSync(dbPath + "-shm");
+      } catch (e) {
+        errors.push(`DB file: ${e.message}`);
+      }
+
+      // Delete .env file
+      try {
+        const envPath = path.join(app.getPath("userData"), ".env");
+        if (fs.existsSync(envPath)) fs.unlinkSync(envPath);
+      } catch (e) {
+        errors.push(`Env file: ${e.message}`);
+      }
+
+      // Clear session cookies
+      try {
+        const win = BrowserWindow.fromWebContents(event.sender);
+        if (win) await win.webContents.session.clearStorageData({ storages: ["cookies"] });
+      } catch (e) {
+        errors.push(`Cookies: ${e.message}`);
+      }
+
+      // Clear localStorage
+      if (mainWindow?.webContents) {
+        try {
+          await mainWindow.webContents.executeJavaScript("localStorage.clear()");
+        } catch (e) {
+          errors.push(`localStorage: ${e.message}`);
+        }
+      }
+
+      if (errors.length > 0) {
+        debugLogger.warn("Cleanup completed with errors", { errors }, "cleanup");
+      }
+
+      return { success: errors.length === 0, message: "Cleanup completed", errors };
     });
 
     ipcMain.handle("update-hotkey", async (event, hotkey) => {

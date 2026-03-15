@@ -1013,7 +1013,20 @@
         "title": "Prueba Pro gratis por 7 días"
       },
       "user": "Usuario",
-      "wordsRemaining": "{{remaining}} restantes"
+      "wordsRemaining": "{{remaining}} restantes",
+      "deleteAccount": {
+        "label": "Eliminar cuenta",
+        "labelDescription": "Eliminar permanentemente tu cuenta, todos los datos en la nube y los datos locales. Esta acción no se puede deshacer.",
+        "button": "Eliminar mi cuenta",
+        "deleting": "Eliminando...",
+        "title": "¿Eliminar tu cuenta?",
+        "description": "Esto eliminará permanentemente tu cuenta de OpenWhispr, todas las notas sincronizadas en la nube y todos los datos locales, incluyendo transcripciones, grabaciones de audio, modelos descargados, conexiones de calendario y configuraciones. Esta acción no se puede deshacer.",
+        "confirmText": "Eliminar todo",
+        "successTitle": "Cuenta eliminada",
+        "successDescription": "Tu cuenta y todos los datos han sido eliminados. La aplicación se recargará ahora.",
+        "failedTitle": "Error al eliminar",
+        "failedDescription": "Algo salió mal al eliminar tu cuenta. Es posible que tus datos locales se hayan eliminado parcialmente. Inténtalo de nuevo."
+      }
     },
     "agentConfig": {
       "agentName": "Nombre del agente",
@@ -1077,7 +1090,7 @@
       "removing": "Eliminando...",
       "resetAll": {
         "confirmText": "Eliminar todo",
-        "description": "Esto eliminará permanentemente todos los ajustes, transcripciones y datos en caché. La app se recargará tras el restablecimiento.",
+        "description": "Esta acción eliminará permanentemente todas las configuraciones locales, transcripciones, grabaciones de audio, modelos de IA descargados, conexiones de calendario y datos en caché. Los datos en la nube y tu cuenta no se verán afectados. La aplicación se recargará después del restablecimiento.",
         "failedDescription": "Algo salió mal. Inténtalo de nuevo o reinstala la app.",
         "failedTitle": "No se pudo restablecer",
         "successDescription": "Todo ha sido restablecido. La app se recargará ahora.",
@@ -1085,7 +1098,7 @@
         "title": "Restablecer todos los datos de la app"
       },
       "resetAppData": "Restablecer datos de la app",
-      "resetAppDataDescription": "Elimina permanentemente todos los ajustes, transcripciones y datos en caché"
+      "resetAppDataDescription": "Eliminar permanentemente todas las configuraciones locales, transcripciones, grabaciones de audio, modelos descargados y datos en caché"
     },
     "dictionary": {
       "title": "Diccionario personalizado",
@@ -1130,6 +1143,11 @@
         "description": "La combinación de teclas que inicia y detiene el dictado por voz",
         "resetToDefault": "Restablecer a {{hotkey}}",
         "title": "Atajo de dictado"
+      },
+      "meetingHotkey": {
+        "title": "Atajo modo reunión",
+        "description": "Iniciar modo reunión y ajustar el panel al lado de la pantalla",
+        "clear": "Eliminar atajo"
       },
       "microphone": {
         "description": "Selecciona qué dispositivo de entrada usar para dictado",

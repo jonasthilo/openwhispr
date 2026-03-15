@@ -985,7 +985,20 @@
         "button": "Criar conta gratuita"
       },
       "user": "Usuário",
-      "wordsRemaining": "{{remaining}} restantes"
+      "wordsRemaining": "{{remaining}} restantes",
+      "deleteAccount": {
+        "label": "Excluir conta",
+        "labelDescription": "Excluir permanentemente sua conta, todos os dados na nuvem e dados locais. Esta ação não pode ser desfeita.",
+        "button": "Excluir minha conta",
+        "deleting": "Excluindo...",
+        "title": "Excluir sua conta?",
+        "description": "Isso excluirá permanentemente sua conta OpenWhispr, todas as notas sincronizadas na nuvem e todos os dados locais, incluindo transcrições, gravações de áudio, modelos baixados, conexões de calendário e configurações. Esta ação não pode ser desfeita.",
+        "confirmText": "Excluir tudo",
+        "successTitle": "Conta excluída",
+        "successDescription": "Sua conta e todos os dados foram excluídos. O aplicativo será recarregado agora.",
+        "failedTitle": "Falha na exclusão",
+        "failedDescription": "Algo deu errado ao excluir sua conta. Seus dados locais podem ter sido parcialmente removidos. Tente novamente."
+      }
     },
     "agentConfig": {
       "agentName": "Nome do agente",
@@ -1049,7 +1062,7 @@
       "removing": "Removendo...",
       "resetAll": {
         "confirmText": "Excluir tudo",
-        "description": "Isso excluirá permanentemente todas as configurações, transcrições e dados em cache. O app será recarregado após a redefinição.",
+        "description": "Isso excluirá permanentemente todas as configurações locais, transcrições, gravações de áudio, modelos de IA baixados, conexões de calendário e dados em cache. Os dados na nuvem e sua conta não serão afetados. O aplicativo será recarregado após a redefinição.",
         "failedDescription": "Algo deu errado. Tente novamente ou reinstale o app.",
         "failedTitle": "Não foi possível redefinir",
         "successDescription": "Tudo foi redefinido. O app será recarregado agora.",
@@ -1057,7 +1070,7 @@
         "title": "Redefinir todos os dados do app"
       },
       "resetAppData": "Redefinir dados do app",
-      "resetAppDataDescription": "Excluir permanentemente todas as configurações, transcrições e dados em cache"
+      "resetAppDataDescription": "Excluir permanentemente todas as configurações locais, transcrições, gravações de áudio, modelos baixados e dados em cache"
     },
     "dictionary": {
       "title": "Dicionário personalizado",
@@ -1102,6 +1115,11 @@
         "description": "A combinação de teclas que inicia e para o ditado por voz",
         "resetToDefault": "Redefinir para {{hotkey}}",
         "title": "Atalho de ditado"
+      },
+      "meetingHotkey": {
+        "title": "Atalho modo reunião",
+        "description": "Iniciar modo reunião e posicionar o painel ao lado da tela",
+        "clear": "Remover atalho"
       },
       "microphone": {
         "description": "Selecione qual dispositivo de entrada usar para ditado",

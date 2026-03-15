@@ -609,7 +609,7 @@ declare global {
 
       // App management
       appQuit: () => Promise<void>;
-      cleanupApp: () => Promise<{ success: boolean; message: string }>;
+      cleanupApp: () => Promise<{ success: boolean; message: string; errors?: string[] }>;
 
       // Update operations
       checkForUpdates: () => Promise<UpdateCheckResult>;
@@ -744,6 +744,7 @@ declare global {
       // Windows Push-to-Talk notifications
       notifyActivationModeChanged?: (mode: "tap" | "push") => void;
       notifyHotkeyChanged?: (hotkey: string) => void;
+      notifyMeetingHotkeyChanged?: (hotkey: string) => void;
       notifyFloatingIconAutoHideChanged?: (enabled: boolean) => void;
       onFloatingIconAutoHideChanged?: (callback: (enabled: boolean) => void) => () => void;
       notifyStartMinimizedChanged?: (enabled: boolean) => void;

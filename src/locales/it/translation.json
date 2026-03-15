@@ -1013,7 +1013,20 @@
         "button": "Crea account gratuito"
       },
       "user": "Utente",
-      "wordsRemaining": "{{remaining}} rimanenti"
+      "wordsRemaining": "{{remaining}} rimanenti",
+      "deleteAccount": {
+        "label": "Elimina account",
+        "labelDescription": "Elimina permanentemente il tuo account, tutti i dati cloud e i dati locali. Questa azione non può essere annullata.",
+        "button": "Elimina il mio account",
+        "deleting": "Eliminazione...",
+        "title": "Eliminare il tuo account?",
+        "description": "Questo eliminerà permanentemente il tuo account OpenWhispr, tutte le note sincronizzate nel cloud e tutti i dati locali, incluse trascrizioni, registrazioni audio, modelli scaricati, connessioni calendario e impostazioni. Questa azione non può essere annullata.",
+        "confirmText": "Elimina tutto",
+        "successTitle": "Account eliminato",
+        "successDescription": "Il tuo account e tutti i dati sono stati eliminati. L'app si ricaricherà ora.",
+        "failedTitle": "Eliminazione fallita",
+        "failedDescription": "Qualcosa è andato storto durante l'eliminazione del tuo account. I tuoi dati locali potrebbero essere stati parzialmente rimossi. Riprova."
+      }
     },
     "agentConfig": {
       "agentName": "Nome dell'agente",
@@ -1077,7 +1090,7 @@
       "removing": "Rimozione...",
       "resetAll": {
         "confirmText": "Elimina tutto",
-        "description": "Questa operazione eliminerà definitivamente tutte le impostazioni, le trascrizioni e i dati in cache. L'app si ricaricherà dopo il ripristino.",
+        "description": "Questo eliminerà permanentemente tutte le impostazioni locali, trascrizioni, registrazioni audio, modelli IA scaricati, connessioni calendario e dati memorizzati nella cache. I dati cloud e il tuo account non saranno interessati. L'app si ricaricherà dopo il ripristino.",
         "failedDescription": "Qualcosa è andato storto. Riprova o reinstalla l'app.",
         "failedTitle": "Impossibile reimpostare",
         "successDescription": "Tutto è stato reimpostato. L'app si ricaricherà ora.",
@@ -1085,7 +1098,7 @@
         "title": "Reimposta tutti i dati dell'app"
       },
       "resetAppData": "Reimposta dati app",
-      "resetAppDataDescription": "Elimina definitivamente tutte le impostazioni, le trascrizioni e i dati in cache"
+      "resetAppDataDescription": "Eliminare permanentemente tutte le impostazioni locali, trascrizioni, registrazioni audio, modelli scaricati e dati memorizzati nella cache"
     },
     "dictionary": {
       "title": "Dizionario personalizzato",
@@ -1130,6 +1143,11 @@
         "description": "La combinazione di tasti che avvia e ferma la dettatura vocale",
         "resetToDefault": "Ripristina a {{hotkey}}",
         "title": "Scorciatoia di dettatura"
+      },
+      "meetingHotkey": {
+        "title": "Scorciatoia modalità meeting",
+        "description": "Avvia la modalità meeting e posiziona il pannello a lato dello schermo",
+        "clear": "Rimuovi scorciatoia"
       },
       "microphone": {
         "description": "Seleziona il dispositivo di ingresso da usare per la dettatura",

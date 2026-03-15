@@ -1068,7 +1068,20 @@
         "button": "Create Free Account"
       },
       "user": "User",
-      "wordsRemaining": "{{remaining}} remaining"
+      "wordsRemaining": "{{remaining}} remaining",
+      "deleteAccount": {
+        "label": "Delete Account",
+        "labelDescription": "Permanently delete your account, all cloud data, and local data. This action cannot be undone.",
+        "button": "Delete My Account",
+        "deleting": "Deleting...",
+        "title": "Delete Your Account?",
+        "description": "This will permanently delete your OpenWhispr account, all cloud-synced notes, and all local data including transcriptions, audio recordings, downloaded models, calendar connections, and settings. This action cannot be undone.",
+        "confirmText": "Delete Everything",
+        "successTitle": "Account Deleted",
+        "successDescription": "Your account and all data have been deleted. The app will now reload.",
+        "failedTitle": "Deletion Failed",
+        "failedDescription": "Something went wrong deleting your account. Your local data may have been partially removed. Please try again."
+      }
     },
     "agentConfig": {
       "agentName": "Agent Name",
@@ -1132,7 +1145,7 @@
       "removing": "Removing...",
       "resetAll": {
         "confirmText": "Delete Everything",
-        "description": "This will permanently delete all settings, transcriptions, and cached data. The app will reload after reset.",
+        "description": "This will permanently delete all local settings, transcriptions, audio recordings, downloaded AI models, calendar connections, and cached data. Cloud data and your account will not be affected. The app will reload after reset.",
         "failedDescription": "Something went wrong. Please try again or reinstall the app.",
         "failedTitle": "Couldn't reset",
         "successDescription": "Everything has been reset. The app will reload now.",
@@ -1140,7 +1153,7 @@
         "title": "Reset All App Data"
       },
       "resetAppData": "Reset app data",
-      "resetAppDataDescription": "Permanently delete all settings, transcriptions, and cached data"
+      "resetAppDataDescription": "Permanently delete all local settings, transcriptions, audio recordings, downloaded models, and cached data"
     },
     "dictionary": {
       "title": "Custom Dictionary",
@@ -1190,6 +1203,11 @@
         "description": "The key combination that starts and stops voice dictation",
         "resetToDefault": "Reset to {{hotkey}}",
         "title": "Dictation Hotkey"
+      },
+      "meetingHotkey": {
+        "title": "Meeting Mode Hotkey",
+        "description": "Start meeting mode and snap the panel to the side of the screen",
+        "clear": "Remove hotkey"
       },
       "microphone": {
         "description": "Select which input device to use for dictation",

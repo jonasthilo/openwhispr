@@ -1013,7 +1013,20 @@
         "button": "建立免費帳號"
       },
       "user": "使用者",
-      "wordsRemaining": "剩餘 {{remaining}} 字"
+      "wordsRemaining": "剩餘 {{remaining}} 字",
+      "deleteAccount": {
+        "label": "刪除帳戶",
+        "labelDescription": "永久刪除您的帳戶、所有雲端資料和本地資料。此操作無法復原。",
+        "button": "刪除我的帳戶",
+        "deleting": "正在刪除...",
+        "title": "刪除您的帳戶？",
+        "description": "這將永久刪除您的 OpenWhispr 帳戶、所有雲端同步筆記和所有本地資料，包括轉錄、音訊錄製、下載的模型、行事曆連線和設定。此操作無法復原。",
+        "confirmText": "刪除所有內容",
+        "successTitle": "帳戶已刪除",
+        "successDescription": "您的帳戶和所有資料已被刪除。應用程式將立即重新載入。",
+        "failedTitle": "刪除失敗",
+        "failedDescription": "刪除您的帳戶時發生錯誤。您的本地資料可能已被部分刪除。請重試。"
+      }
     },
     "agentConfig": {
       "agentName": "助理名稱",
@@ -1077,7 +1090,7 @@
       "removing": "移除中...",
       "resetAll": {
         "confirmText": "刪除所有資料",
-        "description": "這將永久刪除所有設定、轉錄記錄和快取資料。重設後應用程式將重新載入。",
+        "description": "這將永久刪除所有本地設定、轉錄、音訊錄製、下載的 AI 模型、行事曆連線和快取資料。雲端資料和您的帳戶不會受到影響。應用程式將在重設後重新載入。",
         "failedDescription": "發生錯誤。請再試一次或重新安裝應用程式。",
         "failedTitle": "無法重設",
         "successDescription": "所有資料已重設。應用程式即將重新載入。",
@@ -1085,7 +1098,7 @@
         "title": "重設所有應用程式資料"
       },
       "resetAppData": "重設應用程式資料",
-      "resetAppDataDescription": "永久刪除所有設定、轉錄記錄和快取資料"
+      "resetAppDataDescription": "永久刪除所有本地設定、轉錄、音訊錄製、下載的模型和快取資料"
     },
     "dictionary": {
       "title": "自訂詞典",
@@ -1130,6 +1143,11 @@
         "description": "用來開始和停止語音輸入的組合鍵",
         "resetToDefault": "重置為 {{hotkey}}",
         "title": "語音輸入快捷鍵"
+      },
+      "meetingHotkey": {
+        "title": "會議模式快捷鍵",
+        "description": "啟動會議模式並將面板固定到螢幕側邊",
+        "clear": "移除快捷鍵"
       },
       "microphone": {
         "description": "選擇用於語音輸入的輸入裝置",
