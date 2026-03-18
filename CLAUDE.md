@@ -119,6 +119,7 @@ OpenWhispr is an Electron-based desktop dictation application that uses whisper.
   - Falls back to system installation (`brew install whisper-cpp`)
   - GGML model downloads from HuggingFace
   - Models stored in `~/.cache/openwhispr/whisper-models/`
+  - **GPU acceleration (Windows)**: `vulkanGpuDetector.js` detects Intel Arc / AMD Radeon via PowerShell WMI and selects `whisper-server-win32-x64-vulkan.exe`; adds `--no-flash-attn` (required for Intel Arc)
 
 ### NVIDIA Parakeet Integration (via sherpa-onnx)
 

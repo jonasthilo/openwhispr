@@ -1488,6 +1488,38 @@ class IPCHandlers {
       }
     });
 
+    // Vulkan GPU detection handlers
+    ipcMain.handle("detect-vulkan-gpu", async () => {
+      try {
+        const { detectVulkanGpu } = require("./vulkanGpuDetector");
+        return await detectVulkanGpu();
+      } catch (error) {
+        debugLogger.error("Vulkan GPU detection error:", error);
+        return { hasVulkanGpu: false, error: error.message };
+      }
+    });
+
+    ipcMain.handle("get-recommended-vulkan-variant", async () => {
+      try {
+        const { getRecommendedVariant } = require("./vulkanGpuDetector");
+        return await getRecommendedVariant();
+      } catch (error) {
+        debugLogger.error("Error getting recommended Vulkan variant:", error);
+        return "cpu";
+      }
+    });
+
+    ipcMain.handle("clear-vulkan-gpu-cache", () => {
+      try {
+        const { clearCache } = require("./vulkanGpuDetector");
+        clearCache();
+        return { success: true };
+      } catch (error) {
+        debugLogger.error("Error clearing Vulkan GPU cache:", error);
+        return { success: false, error: error.message };
+      }
+    });
+
     // Debug logging handlers
     ipcMain.handle("get-debug-state", async () => {
       try {

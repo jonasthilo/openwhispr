@@ -68,6 +68,9 @@ class WhisperManager {
 
       await cleanupStaleDownloads(this.getModelsDir());
 
+      // Pre-warm Vulkan GPU detection cache (avoids sync PowerShell call on first transcription)
+      require("./vulkanGpuDetector").detectVulkanGpu().catch(() => {});
+
       // Pre-warm whisper-server if local mode enabled (eliminates 2-5s cold-start delay)
       const { localTranscriptionProvider, whisperModel } = settings;
 

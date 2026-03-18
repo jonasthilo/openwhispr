@@ -213,6 +213,11 @@ contextBridge.exposeInMainWorld("electronAPI", {
   getLogLevel: () => ipcRenderer.invoke("get-log-level"),
   log: (entry) => ipcRenderer.invoke("app-log", entry),
 
+  // Vulkan GPU detection
+  detectVulkanGpu: () => ipcRenderer.invoke("detect-vulkan-gpu"),
+  getRecommendedVulkanVariant: () => ipcRenderer.invoke("get-recommended-vulkan-variant"),
+  clearVulkanGpuCache: () => ipcRenderer.invoke("clear-vulkan-gpu-cache"),
+
   // Debug logging management
   getDebugState: () => ipcRenderer.invoke("get-debug-state"),
   setDebugLogging: (enabled) => ipcRenderer.invoke("set-debug-logging", enabled),
