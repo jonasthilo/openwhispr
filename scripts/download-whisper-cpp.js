@@ -12,6 +12,7 @@ const {
 } = require("./lib/download-utils");
 
 const WHISPER_CPP_REPO = "OpenWhispr/whisper.cpp";
+const WHISPER_VULKAN_REPO = "jonasthilo/whisper.cpp";
 
 // Version can be pinned via environment variable for reproducible builds
 const VERSION_OVERRIDE = process.env.WHISPER_CPP_VERSION || null;
@@ -39,10 +40,22 @@ const BINARIES = {
   },
 };
 
+// Vulkan binaries (Windows only for now, from jonasthilo/whisper.cpp releases)
+const VULKAN_BINARIES = {
+  "win32-x64": {
+    zipName: "whisper-vulkan-bin-x64.zip",
+    binaryName: "whisper-server.exe",
+    outputName: "whisper-server-win32-x64-vulkan.exe",
+    // DLLs required by the Vulkan binary
+    dlls: ["ggml-vulkan.dll", "ggml.dll", "ggml-base.dll", "ggml-cpu.dll", "whisper.dll"],
+  },
+};
+
 const BIN_DIR = path.join(__dirname, "..", "resources", "bin");
 
 // Cache the release info to avoid multiple API calls
 let cachedRelease = null;
+let cachedVulkanRelease = null;
 
 async function getRelease() {
   if (cachedRelease) return cachedRelease;
@@ -55,55 +68,74 @@ async function getRelease() {
   return cachedRelease;
 }
 
+async function getVulkanRelease() {
+  if (cachedVulkanRelease) return cachedVulkanRelease;
+  cachedVulkanRelease = await fetchLatestRelease(WHISPER_VULKAN_REPO);
+  return cachedVulkanRelease;
+}
+
 function getDownloadUrl(release, zipName) {
   const asset = release?.assets?.find((a) => a.name === zipName);
   return asset?.url || null;
 }
 
-async function downloadBinary(platformArch, config, release, isForce = false) {
+async function downloadBinary(platformArch, config, release, isForce = false, label = "server") {
   if (!config) {
-    console.log(`  [server] ${platformArch}: Not supported`);
+    console.log(`  [${label}] ${platformArch}: Not supported`);
     return false;
   }
 
   const outputPath = path.join(BIN_DIR, config.outputName);
+  const extraFiles = config.dlls || [];
+  const allPresent =
+    fs.existsSync(outputPath) &&
+    extraFiles.every((f) => fs.existsSync(path.join(BIN_DIR, f)));
 
-  if (fs.existsSync(outputPath) && !isForce) {
-    console.log(`  [server] ${platformArch}: Already exists (use --force to re-download)`);
+  if (allPresent && !isForce) {
+    console.log(`  [${label}] ${platformArch}: Already exists (use --force to re-download)`);
     return true;
   }
 
   const url = getDownloadUrl(release, config.zipName);
   if (!url) {
-    console.error(`  [server] ${platformArch}: Asset ${config.zipName} not found in release`);
+    console.error(`  [${label}] ${platformArch}: Asset ${config.zipName} not found in release`);
     return false;
   }
-  console.log(`  [server] ${platformArch}: Downloading from ${url}`);
+  console.log(`  [${label}] ${platformArch}: Downloading from ${url}`);
 
   const zipPath = path.join(BIN_DIR, config.zipName);
 
   try {
     await downloadFile(url, zipPath);
 
-    const extractDir = path.join(BIN_DIR, `temp-whisper-${platformArch}`);
+    const extractDir = path.join(BIN_DIR, `temp-${label}-${platformArch}`);
     fs.mkdirSync(extractDir, { recursive: true });
     await extractZip(zipPath, extractDir);
 
     const binaryPath = findBinaryInDir(extractDir, config.binaryName);
-    if (binaryPath) {
-      fs.copyFileSync(binaryPath, outputPath);
-      setExecutable(outputPath);
-      console.log(`  [server] ${platformArch}: Extracted to ${config.outputName}`);
-    } else {
-      console.error(`  [server] ${platformArch}: Binary "${config.binaryName}" not found in archive`);
+    if (!binaryPath) {
+      console.error(`  [${label}] ${platformArch}: Binary "${config.binaryName}" not found in archive`);
       return false;
+    }
+    fs.copyFileSync(binaryPath, outputPath);
+    setExecutable(outputPath);
+    console.log(`  [${label}] ${platformArch}: Extracted to ${config.outputName}`);
+
+    for (const dll of extraFiles) {
+      const dllPath = findBinaryInDir(extractDir, dll);
+      if (dllPath) {
+        fs.copyFileSync(dllPath, path.join(BIN_DIR, dll));
+        console.log(`  [${label}] ${platformArch}: Extracted ${dll}`);
+      } else {
+        console.warn(`  [${label}] ${platformArch}: "${dll}" not found in archive`);
+      }
     }
 
     fs.rmSync(extractDir, { recursive: true, force: true });
     if (fs.existsSync(zipPath)) fs.unlinkSync(zipPath);
     return true;
   } catch (error) {
-    console.error(`  [server] ${platformArch}: Failed - ${error.message}`);
+    console.error(`  [${label}] ${platformArch}: Failed - ${error.message}`);
     if (fs.existsSync(zipPath)) fs.unlinkSync(zipPath);
     return false;
   }
@@ -153,6 +185,18 @@ async function main() {
     for (const platformArch of Object.keys(BINARIES)) {
       await downloadBinary(platformArch, BINARIES[platformArch], release, args.isForce);
     }
+  }
+
+  // Vulkan binaries (Windows only, from separate repo)
+  const vulkanRelease = await getVulkanRelease();
+  if (vulkanRelease) {
+    console.log(`\nDownloading whisper-server Vulkan binaries (${vulkanRelease.tag}):\n`);
+    const vulkanPlatforms = args.isCurrent ? [args.platformArch] : Object.keys(VULKAN_BINARIES);
+    for (const platformArch of vulkanPlatforms) {
+      await downloadBinary(platformArch, VULKAN_BINARIES[platformArch], vulkanRelease, args.isForce, "vulkan");
+    }
+  } else {
+    console.warn(`[vulkan] Could not fetch release from ${WHISPER_VULKAN_REPO} — skipping`);
   }
 
   console.log("\n---");

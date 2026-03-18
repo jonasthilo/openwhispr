@@ -4,6 +4,7 @@ const net = require("net");
 const path = require("path");
 const http = require("http");
 const debugLogger = require("./debugLogger");
+const { getRecommendedVariantSync } = require("./vulkanGpuDetector");
 const { killProcess } = require("../utils/process");
 const { getSafeTempDir } = require("./safeTempDir");
 const { convertToWav } = require("./ffmpegUtils");
@@ -123,34 +124,47 @@ class WhisperServerManager {
     const platform = process.platform;
     const arch = process.arch;
     const platformArch = `${platform}-${arch}`;
+
+    // Prefer Vulkan binary on Windows when a supported Vulkan GPU is detected
+    let variant = "";
+    if (platform === "win32" && getRecommendedVariantSync() === "vulkan") {
+      variant = "-vulkan";
+    }
+
     const binaryName =
       platform === "win32"
-        ? `whisper-server-${platformArch}.exe`
+        ? `whisper-server-${platformArch}${variant}.exe`
         : `whisper-server-${platformArch}`;
     const genericName = platform === "win32" ? "whisper-server.exe" : "whisper-server";
 
-    const candidates = [];
+    const binDirs = [];
+    if (process.resourcesPath) binDirs.push(path.join(process.resourcesPath, "bin"));
+    binDirs.push(path.join(__dirname, "..", "..", "resources", "bin"));
 
-    if (process.resourcesPath) {
-      candidates.push(
-        path.join(process.resourcesPath, "bin", binaryName),
-        path.join(process.resourcesPath, "bin", genericName)
-      );
-    }
-
-    candidates.push(
-      path.join(__dirname, "..", "..", "resources", "bin", binaryName),
-      path.join(__dirname, "..", "..", "resources", "bin", genericName)
-    );
+    const candidates = binDirs.flatMap((dir) => [path.join(dir, binaryName), path.join(dir, genericName)]);
 
     for (const candidate of candidates) {
       if (fs.existsSync(candidate)) {
         try {
           fs.statSync(candidate);
+          debugLogger.info("Found whisper-server binary", { path: candidate, variant: variant || "cpu" });
           this.cachedServerBinaryPath = candidate;
           return candidate;
         } catch {
           // Can't access binary
+        }
+      }
+    }
+
+    // Vulkan binary not found — fall back to CPU
+    if (variant) {
+      debugLogger.warn("Vulkan GPU detected but Vulkan binary not found — falling back to CPU binary");
+      const cpuName = `whisper-server-${platformArch}.exe`;
+      for (const dir of binDirs) {
+        const candidate = path.join(dir, cpuName);
+        if (fs.existsSync(candidate)) {
+          this.cachedServerBinaryPath = candidate;
+          return candidate;
         }
       }
     }
@@ -236,6 +250,9 @@ class WhisperServerManager {
     // whisper.cpp defaults to English when --language is omitted;
     // explicitly pass "auto" to enable language auto-detection
     args.push("--language", options.language || "auto");
+
+    // Flash Attention causes severe slowdowns on Intel Arc Vulkan — disable it
+    if (serverBinary.includes("-vulkan")) args.push("--no-flash-attn");
 
     debugLogger.debug("Starting whisper-server", {
       port: this.port,
