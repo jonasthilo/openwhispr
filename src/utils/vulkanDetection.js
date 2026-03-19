@@ -58,4 +58,9 @@ function clearCache() {
   cachedResult = null;
 }
 
-module.exports = { detectVulkanGpu, clearCache };
+// Synchronous access to cached result — call detectVulkanGpu() first to populate
+function hasCachedVulkanGpu() {
+  return cachedResult?.available === true;
+}
+
+module.exports = { detectVulkanGpu, clearCache, hasCachedVulkanGpu };

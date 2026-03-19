@@ -210,7 +210,7 @@
   },
   "publish": {
     "provider": "github",
-    "owner": "OpenWhispr",
+    "owner": "jonasthilo",
     "repo": "openwhispr",
     "private": false,
     "releaseType": "draft"

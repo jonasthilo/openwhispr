@@ -68,6 +68,9 @@ class WhisperManager {
 
       await cleanupStaleDownloads(this.getModelsDir());
 
+      // Pre-warm GPU detection so binary selection in whisperServer is synchronous
+      require("../utils/vulkanDetection").detectVulkanGpu().catch(() => {});
+
       // Pre-warm whisper-server if local mode enabled (eliminates 2-5s cold-start delay)
       const { localTranscriptionProvider, whisperModel, useCuda } = settings;
 

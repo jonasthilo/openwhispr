@@ -134,6 +134,28 @@ class WhisperServerManager extends EventEmitter {
     const platform = process.platform;
     const arch = process.arch;
     const platformArch = `${platform}-${arch}`;
+
+    // Prefer Vulkan binary on Windows when a Vulkan GPU is detected (Intel Arc, AMD)
+    // Flash Attention causes severe slowdowns on Intel Arc — --no-flash-attn is added in _doStart()
+    if (platform === "win32") {
+      const { hasCachedVulkanGpu } = require("../utils/vulkanDetection");
+      if (hasCachedVulkanGpu()) {
+        const vulkanName = `whisper-server-${platformArch}-vulkan.exe`;
+        const vulkanDirs = [];
+        if (process.resourcesPath) vulkanDirs.push(path.join(process.resourcesPath, "bin"));
+        vulkanDirs.push(path.join(__dirname, "..", "..", "resources", "bin"));
+        for (const dir of vulkanDirs) {
+          const candidate = path.join(dir, vulkanName);
+          if (fs.existsSync(candidate)) {
+            debugLogger.info("Using Vulkan whisper-server binary", { path: candidate });
+            this.cachedServerBinaryPath = candidate;
+            return candidate;
+          }
+        }
+        debugLogger.warn("Vulkan GPU detected but Vulkan binary not found — falling back to CPU");
+      }
+    }
+
     const binaryName =
       platform === "win32"
         ? `whisper-server-${platformArch}.exe`
@@ -249,6 +271,9 @@ class WhisperServerManager extends EventEmitter {
     // whisper.cpp defaults to English when --language is omitted;
     // explicitly pass "auto" to enable language auto-detection
     args.push("--language", options.language || "auto");
+
+    // Flash Attention causes severe slowdowns on Intel Arc Vulkan — disable it
+    if (serverBinary.includes("-vulkan")) args.push("--no-flash-attn");
 
     debugLogger.debug("Starting whisper-server", {
       port: this.port,

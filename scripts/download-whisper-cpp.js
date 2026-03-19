@@ -12,6 +12,7 @@ const {
 } = require("./lib/download-utils");
 
 const WHISPER_CPP_REPO = "OpenWhispr/whisper.cpp";
+const WHISPER_VULKAN_REPO = "jonasthilo/whisper.cpp";
 
 // Version can be pinned via environment variable for reproducible builds
 const VERSION_OVERRIDE = process.env.WHISPER_CPP_VERSION || null;
@@ -37,12 +38,18 @@ const BINARIES = {
     binaryName: "whisper-server-linux-x64-cpu",
     outputName: "whisper-server-linux-x64",
   },
+  "win32-x64-vulkan": {
+    zipName: "whisper-vulkan-bin-x64.zip",
+    binaryName: "whisper-server.exe",
+    outputName: "whisper-server-win32-x64-vulkan.exe",
+  },
 };
 
 const BIN_DIR = path.join(__dirname, "..", "resources", "bin");
 
 // Cache the release info to avoid multiple API calls
 let cachedRelease = null;
+let cachedVulkanRelease = null;
 
 async function getRelease() {
   if (cachedRelease) return cachedRelease;
@@ -53,6 +60,12 @@ async function getRelease() {
     cachedRelease = await fetchLatestRelease(WHISPER_CPP_REPO);
   }
   return cachedRelease;
+}
+
+async function getVulkanRelease() {
+  if (cachedVulkanRelease) return cachedVulkanRelease;
+  cachedVulkanRelease = await fetchLatestRelease(WHISPER_VULKAN_REPO);
+  return cachedVulkanRelease;
 }
 
 function getDownloadUrl(release, zipName) {
@@ -93,6 +106,12 @@ async function downloadBinary(platformArch, config, release, isForce = false) {
     if (binaryPath) {
       fs.copyFileSync(binaryPath, outputPath);
       setExecutable(outputPath);
+      // Copy any companion DLLs from the archive (no-op when archive has only the binary)
+      for (const file of fs.readdirSync(extractDir)) {
+        if (file.endsWith(".dll")) {
+          fs.copyFileSync(path.join(extractDir, file), path.join(BIN_DIR, file));
+        }
+      }
       console.log(`  [server] ${platformArch}: Extracted to ${config.outputName}`);
     } else {
       console.error(
@@ -132,24 +151,30 @@ async function main() {
 
   const args = parseArgs();
 
+  async function releaseFor(platformArch) {
+    return platformArch.endsWith("-vulkan") ? getVulkanRelease() : release;
+  }
+
   if (args.isCurrent) {
-    if (!BINARIES[args.platformArch]) {
+    // Download CPU binary + Vulkan variant (if available for this platform)
+    const targets = [args.platformArch, `${args.platformArch}-vulkan`].filter(
+      (k) => BINARIES[k]
+    );
+
+    if (targets.length === 0) {
       console.error(`Unsupported platform/arch: ${args.platformArch}`);
       process.exitCode = 1;
       return;
     }
 
     console.log(`Downloading for target platform (${args.platformArch}):`);
-    const ok = await downloadBinary(
-      args.platformArch,
-      BINARIES[args.platformArch],
-      release,
-      args.isForce
-    );
-    if (!ok) {
-      console.error(`Failed to download binaries for ${args.platformArch}`);
-      process.exitCode = 1;
-      return;
+    for (const target of targets) {
+      const ok = await downloadBinary(target, BINARIES[target], await releaseFor(target), args.isForce);
+      if (!ok && target === args.platformArch) {
+        console.error(`Failed to download binaries for ${target}`);
+        process.exitCode = 1;
+        return;
+      }
     }
 
     if (args.shouldCleanup) {
@@ -158,7 +183,7 @@ async function main() {
   } else {
     console.log("Downloading binaries for all platforms:");
     for (const platformArch of Object.keys(BINARIES)) {
-      await downloadBinary(platformArch, BINARIES[platformArch], release, args.isForce);
+      await downloadBinary(platformArch, BINARIES[platformArch], await releaseFor(platformArch), args.isForce);
     }
   }
 

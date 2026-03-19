@@ -1,0 +1,52 @@
+name: Sync Upstream
+
+on:
+  schedule:
+    - cron: "0 8 * * 1" # Monday 08:00 UTC (after whisper.cpp weekly build)
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+jobs:
+  sync:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+          token: ${{ secrets.GH_TOKEN }}
+
+      - name: Configure git
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+
+      - name: Fetch upstream
+        run: git remote add upstream https://github.com/OpenWhispr/openwhispr.git && git fetch upstream
+
+      - name: Check for new upstream version
+        id: version_check
+        run: |
+          UPSTREAM_VERSION=$(git show upstream/main:package.json | node -e "process.stdin.resume();let d='';process.stdin.on('data',c=>d+=c).on('end',()=>console.log(JSON.parse(d).version))")
+          CURRENT_VERSION=$(node -e "console.log(require('./package.json').version)")
+          echo "upstream=$UPSTREAM_VERSION" >> $GITHUB_OUTPUT
+          echo "current=$CURRENT_VERSION" >> $GITHUB_OUTPUT
+          if [ "$UPSTREAM_VERSION" != "$CURRENT_VERSION" ]; then
+            echo "changed=true" >> $GITHUB_OUTPUT
+          else
+            echo "changed=false" >> $GITHUB_OUTPUT
+          fi
+
+      - name: Merge upstream (if new version)
+        if: steps.version_check.outputs.changed == 'true'
+        run: |
+          git merge upstream/main --no-edit -m "chore: sync upstream v${{ steps.version_check.outputs.upstream }}"
+          git push origin main
+
+      - name: Create release tag (if new version)
+        if: steps.version_check.outputs.changed == 'true'
+        run: |
+          TAG="v${{ steps.version_check.outputs.upstream }}"
+          git tag "$TAG"
+          git push origin "$TAG"
